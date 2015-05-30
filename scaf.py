@@ -121,7 +121,7 @@ class Scaffold:
 			self.setup()
 
 		if not os.path.exists(self.get_config_file()):
-			self.fatal("config_file does not exist: %s" % config_file)
+			self.fatal("config_file does not exist: %s - perhaps you should run --setup" % config_file)
 		else:
 			self._config = configparser.ConfigParser()
 			self._config.read(self.get_config_file())
