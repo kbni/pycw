@@ -1,1 +1,4 @@
 *.pyc
+*.ini
+examples/pycw
+examples/etc

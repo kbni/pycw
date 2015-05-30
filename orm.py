@@ -1,6 +1,7 @@
 # Author: Alex Wilson <alex@kbni.net>
 # License: None, but be cool.
 
+import suds
 import datetime, time, dateutil.parser
 import copy
 import email.parser # This is a bit WTF, isn't it? (It's for parsing email attachments in tickets.)
@@ -179,9 +180,15 @@ class CWObject(object):
 			if self not in self.parent.children:
 				self.parent.children.append(self)
 
-		if record_id:
-			self.record_id = record_id
-			self.load()
+		try:
+			if record_id:
+				self.record_id = record_id
+				self.load()
+		except suds.WebFault as e:
+			if str(e).startswith('Server raised fault: '):
+				raise CWObjectNotFound( str(e).split(':',1)[1].strip() )
+			else:
+				raise e
 
 		if False and from_basic is not None:
 			for attr in dir(from_basic):

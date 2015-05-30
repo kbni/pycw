@@ -2,11 +2,14 @@
 # License: None, but be cool.
 
 # It's just going to complain anyways.
-import logging; logging.getLogger('suds.plugin').setLevel(logging.CRITICAL)
+import logging
+logging.getLogger('suds.plugin').setLevel(logging.CRITICAL)
+logging.getLogger('suds.client').setLevel(logging.CRITICAL)
 
 from soap import SoapCaddy
-from orm import ConnectWiseORM
+from orm import ConnectWiseORM, CWObjectNotFound
 from tests import TestFeatures
+from scaf import Scaffold
 
 def cw_caddy(cw_host, cw_db, cw_user, cw_pass):
 	"""
@@ -42,6 +45,8 @@ def run_tests(**kwargs):
 	the following environment variables:
 
 		CW_USERNAME  CW_PASSWORD  CW_HOSTNAME  CW_DATABASE
+
+		To see what else you could override with kwargs, help(TestFeatures)
 	"""
 	tests = TestFeatures(**kwargs)
 	return tests.start()

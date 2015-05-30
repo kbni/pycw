@@ -8,7 +8,36 @@ import traceback
 
 class TestFeatures:
 	"""
-		TestFeatures()
+		This class will run basic tests using your ConnectWise details, you may
+		want to override these default properties (kwargs passed to __init__)
+
+		@cw_host = ConnectWise hostname (support.yourcompany.com)
+		@cw_db = ConnectWise database (yourcompany)
+		@cw_user = ConnectWise username (SomeIntegratorUsername)
+		@cw_pass = ConnectWise password (Some1nt3grat0rP@ssw0rd)
+
+		@with_company = 'XYZ Test Company' <- full company name
+		@with_board = '1DC | Client Conundrums' <- full service board name
+		@with_activity_type = 'Call' <- activity type 
+		@with_member = 'alex' <- member's email address
+		@with_contact = 'george@example.com' <- contact's email address
+		@status_new = 'SilentNew' <- status for create_ticket
+		@status_close = 'SilentClosed' <- status for close_ticket
+
+		@search_member = True <- test searching for a member
+		@search_company = True <- test searching for a company
+		@search_contact = True <- test searching for a contact
+		@create_ticket = True <- test creating a ticket
+		@create_schedule = True <- test creating a schedule entry
+		@create_time_entry = True <- test creating a time entry
+		@create_internal = True <- test creating an internal note
+		@close_ticket = True <- test closing a ticket
+		@assoc_config = True <- test associating a configuration
+		@create_activity = True <- test creating an activity
+		@delete_ticket = True <- test deleting a ticket
+
+		It's important to note these tests aren't entirely conclusive, and created
+		test objects should be inspected for errors before proceeding any further.
 	"""
 
 	cw_host = None
