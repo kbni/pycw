@@ -155,8 +155,8 @@ class CWObject(object):
 			@param orm =  ORM object
 			@param record_id = Record ID to assign this object (is negative if not_real)
 			@param data - Pre-loaded data, this would mostly be used for anything with parent_load = True
-			@param parent_load - If load/save should be proxied through parent CWObject (such as for TicketNotes)
 			@param parent - Parent CWObject, for relationship purposes only
+			@param from_basic - Basic data to supply to create an object without fetching additional data
 		"""
 
 		self.load_level = 0
@@ -206,12 +206,6 @@ class CWObject(object):
 
 	def __str__(self):
 		return str(self.__repr__())
-
-	def parent_save(self):
-		return self._save == 'FROM_PARENT'
-
-	def parent_load(self):
-		return self._load == 'FROM_PARENT'
 
 	def is_real_record(self):
 		return self.record_id and self.record_id > 0
@@ -320,8 +314,50 @@ class CWObject(object):
 	def __getattr__(self, key):
 		if hasattr(self.base, key):
 			return getattr(self.data, key)
+		
+		elif key == 'Company': return self.get_company()
+		elif key == 'Contact': return self.get_contact()
+
 		else:
 			raise AttributeError('No such attribute in data: %s' % key)
+
+	_company = None
+	def get_company(self):
+		if self._company is None:
+			if hasattr(self.data, 'CompanyIdentifier') and self.data.CompanyIdentifier is not None:
+				res = self.orm.search('Company', 'CompanyIdentifier = "%s"' % self.data.CompanyIdentifier)
+				if res:
+					self._company = res[0]
+					return self._company
+
+			if hasattr(self.data, 'CompanyId') and type(self.data.CompanyId) == int:
+				res = self.orm.Company(self.data.CompanyId)
+				if res:
+					self._company = res
+					return self._company
+
+			if hasattr(self.data, 'CompanyId') and type(self.data.CompanyId) == str:
+				res = self.orm.search('Company', 'CompanyIdentifier = "%s"' % self.data.CompanyId)
+				if res:
+					self._company = res[0]
+					return self._company
+		else:
+			return self._company
+
+		raise AttributeError("%s has no Company" % self)
+
+	_contact = None
+	def get_contact(self):
+		if self._contact is None:
+			if hasattr(self.data, 'ContactId') and type(self.data.ContactId) == int:
+				res = self.orm.Company(self.data.ContactId)
+				if res:
+					self._contact = res
+					return self._contact
+		else:
+			return self._contact
+
+		raise AttributeError("%s has no Contact" % self)
 
 	def delete(self):
 		pass
@@ -335,7 +371,7 @@ class CWObject(object):
 			return soap_client.factory.create(factory_name)
 
 	def discard(self):
-		if self.parent and self.parent_load:
+		if self.parent and self._load == 'FROM_PARENT':
 			self.parent.discard()
 			return self
 		else:
@@ -422,12 +458,6 @@ class Contact(CWObject):
 		if isinstance(birthday_str, datetime.datetime):
 			self.data.BirthDay = birthday_str
 		return self.data.BirthDay
-
-	def get_company(self):
-		if self.data.CompanyIdentifier is not None:
-			res = self.orm.search('Company', 'CompanyIdentifier = "%s"' % self.data.CompanyIdentifier)
-			if res:
-				return res[0]
 
 	def get_full_name(self):
 		return '%s %s' % (self.FirstName, self.LastName)
